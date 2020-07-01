@@ -7,7 +7,7 @@ import java.nio.channels.SocketChannel;
 
 public class NIOClient {
     private static final int BUFFER_SIZE = 256;
-    private static final int PORT = 8188;
+    private static final int PORT = 8888;
 
     public static void main(String[] args) {
         System.out.println("Starting NIO client!");
