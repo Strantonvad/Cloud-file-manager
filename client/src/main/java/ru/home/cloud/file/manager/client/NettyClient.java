@@ -9,10 +9,10 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import ru.home.cloud.file.manager.client.handlers.ClientHandler;
-import ru.home.cloud.file.manager.client.handlers.NetworkHandler;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStreamReader;
 
 public class NettyClient {
@@ -33,7 +33,7 @@ public class NettyClient {
                             socketChannel.pipeline().addLast(
 //                                new RequestDataEncoder(),
 //                                new ResponseDataDecoder(),
-                                new NetworkHandler());
+                                new NetworkClientHandler());
                         }
                     });
 
@@ -49,6 +49,11 @@ public class NettyClient {
                     if (line.startsWith("ping")) {
                         byteBuf.writeInt(0);
                         byteBuf.writeLong(System.nanoTime());
+                    }
+                    if (line.startsWith("copy")) {
+                        byteBuf.writeInt(1);
+                        File file = new File("C:\\Geekbrains\\cloud-file-manager\\client\\src\\main\\resources\\test.txt");
+                        byteBuf.writeBytes(new FileInputStream(file), (int) file.length());
                     }
                     f.channel().writeAndFlush(byteBuf, f.channel().voidPromise());
                 }

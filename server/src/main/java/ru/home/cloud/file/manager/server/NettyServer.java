@@ -1,4 +1,4 @@
-package ru.home.cloud.file.manager.client;
+package ru.home.cloud.file.manager.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -7,11 +7,9 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
 
 public class NettyServer {
-    private static final int PORT = 8888;
+    private static final int PORT = 9999;
 
     public NettyServer() {
         EventLoopGroup auth = new NioEventLoopGroup(1);
@@ -20,14 +18,14 @@ public class NettyServer {
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(auth, worker)
                 .channel(NioServerSocketChannel.class)
-                .handler(new LoggingHandler(LogLevel.DEBUG))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
-                        socketChannel.pipeline().addLast(/*new StringDecoder(), new StringEncoder(), */new NetworkHandler());
+                        socketChannel.pipeline().addLast(new NetworkServerHandler());
                     }
                 });
             ChannelFuture future = bootstrap.bind(PORT).sync();
+            System.out.println("Netty server started!");
             future.channel().closeFuture().sync();
         } catch (Exception e) {
             e.printStackTrace();
