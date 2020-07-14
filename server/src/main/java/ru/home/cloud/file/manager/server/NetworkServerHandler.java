@@ -22,6 +22,16 @@ public class NetworkServerHandler extends ChannelInboundHandlerAdapter {
     private long fileLength;
 
     @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("Client connected!");
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("Client disconnected!");
+    }
+
+    @Override
     public void channelRead(ChannelHandlerContext ctx, Object obj) throws Exception {
         ByteBuf buf = ((ByteBuf) obj);
         while (buf.readableBytes() > 0) {

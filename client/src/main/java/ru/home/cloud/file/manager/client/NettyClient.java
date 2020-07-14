@@ -16,9 +16,17 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 
 public class NettyClient {
-    //    private SocketChannel channel;
-    private static final int PORT = 8888;
+    private static final int PORT = 9999;
     private static final String HOST = "localhost";
+    private SocketChannel channel;
+
+    public SocketChannel getChannel() {
+        return channel;
+    }
+
+    public void setChannel(SocketChannel channel) {
+        this.channel = channel;
+    }
 
     public NettyClient() {
         Thread t = new Thread(() -> {
@@ -30,33 +38,14 @@ public class NettyClient {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
+                            channel = socketChannel;
                             socketChannel.pipeline().addLast(
-//                                new RequestDataEncoder(),
-//                                new ResponseDataDecoder(),
                                 new NetworkClientHandler());
                         }
                     });
 
                 ChannelFuture f = b.connect(HOST, PORT).sync();
 //                f.channel().closeFuture().sync();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    ByteBuf byteBuf = Unpooled.buffer();
-                    if ((line = line.toLowerCase()).length() == 0) {
-                        continue;
-                    }
-                    if (line.startsWith("ping")) {
-                        byteBuf.writeInt(0);
-                        byteBuf.writeLong(System.nanoTime());
-                    }
-                    if (line.startsWith("copy")) {
-                        byteBuf.writeInt(1);
-                        File file = new File("C:\\Geekbrains\\cloud-file-manager\\client\\src\\main\\resources\\test.txt");
-                        byteBuf.writeBytes(new FileInputStream(file), (int) file.length());
-                    }
-                    f.channel().writeAndFlush(byteBuf, f.channel().voidPromise());
-                }
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -66,8 +55,12 @@ public class NettyClient {
         t.start();
     }
 
-    public static void main(String[] args) {
-        new NettyClient();
+    public void close() {
+        channel.close();
     }
+
+//    public static void main(String[] args) {
+//        new NettyClient();
+//    }
 
 }
